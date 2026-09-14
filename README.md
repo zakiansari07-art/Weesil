@@ -545,48 +545,6 @@ ImageTrust/
 ├── .gitignore
 └── README.md
 ```
-ImageTrust/
-│
-├── app/
-│   ├── models/
-│   │   ├── real_ai_detector.py
-│   │   ├── generator_attributor.py
-│   │   ├── forensics_analyzer.py
-│   │   ├── provenance_analyzer.py
-│   │   └── llm.py
-│   │
-│   ├── workflows/
-│   │   └── analysis_graph.py
-│   │
-│   ├── services/
-│   │   └── analysis_service.py
-│   │
-│   ├── schemas/
-│   │   └── predictions.py
-│   │
-│   └── ...
-│
-├── gradio/
-│   └── gradio_ui.py
-│
-├── models/
-│   └── detector.py
-│
-├── assets/
-│   ├── interface.png
-│   ├── report.png
-│   ├── architecture.png
-│   ├── demo.gif
-│   ├── real-ai-confusion-matrix.png
-│   ├── real-ai-roc.png
-│   ├── generator-performance.png
-│   └── generator-confusion-matrices.png
-│
-├── requirements.txt
-├── .env.example
-├── README.md
-└── ...
-```
 
 > **TODO:** Update this structure to exactly match the final repository.
 
