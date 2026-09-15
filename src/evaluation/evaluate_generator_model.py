@@ -20,10 +20,10 @@ project_root = Path.cwd()
 
 path_name = project_root.parent
 
-model_checkpoint = "multi_task_defactify_best_validation.pth"
+model_checkpoint = "multi_task_defactify_with_real_best_validation.pth"
 
 
-file_name = "val_eval_multitask_last_ch.json"
+file_name = "test_eval_multi_task_defactify_with_real_best_validatiomulti_task__AdamW_with_new_split_best.json"
 
 
 def evaluate_generator_model():
@@ -67,7 +67,7 @@ def evaluate_generator_model():
     # ---------------------------------------------------------
     with torch.no_grad():
 
-        for images, generators in tqdm(validation_dataloader):
+        for images, generators in tqdm(test_dataloader):
 
             images = images.to(device=device, non_blocking=True)
                          
@@ -125,7 +125,7 @@ def evaluate_generator_model():
     file_dir = results_dir / dir_name
     file_dir.mkdir(parents=True, exist_ok=True)
 
-    generator_names = ["SD21", "SDXL", "SD3", "DALLE3", "Midjourney"]
+    generator_names = ["Real", "SD21", "SDXL", "SD3", "DALLE3", "Midjourney"]
     results = []
 
     for generator_id, generator_name in enumerate(

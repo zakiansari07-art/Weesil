@@ -1,7 +1,7 @@
 from typing import Tuple
 
 from torch.utils.data import DataLoader
-from datasets import load_dataset
+from datasets import load_dataset, concatenate_datasets
 
 from data.dataset_defactify import (
     DefactifyBinaryClassDataset,
@@ -16,7 +16,14 @@ dataset = load_dataset(DATASET_NAME)
 train_raw = dataset["train"]
 val_raw = dataset["validation"]
 test_raw = dataset["test"]
+full_dataset = concatenate_datasets([train_raw, test_raw])
+new_splits = full_dataset.train_test_split(test_size=0.2)
 
+# Access the train split
+new_train_dataset = new_splits["train"]
+
+# Access the test split
+new_test_dataset = new_splits["test"]
 num_workers = 4
 
 
@@ -76,19 +83,19 @@ def create_generator_task_dataloader(
     batch_size: int = 16,
 ) -> Tuple[DataLoader, DataLoader]:
 
-    train_raw_filtered = train_raw.filter(lambda example: example["Label_B"] != 0)
-    val_raw_filtered = val_raw.filter(lambda example: example["Label_B"] != 0)
+    # train_raw_filtered = train_raw.filter(lambda example: example["Label_B"] != 0)
+    # val_raw_filtered = val_raw.filter(lambda example: example["Label_B"] != 0)
 
-    def id_change(example):
-        example["Label_B"] = example["Label_B"] - 1
-        return example
+    # def id_change(example):
+    #     example["Label_B"] = example["Label_B"] - 1
+    #     return example
 
-    train_new_id = train_raw_filtered.map(id_change)
-    valid_new_id = val_raw_filtered.map(id_change)
+    # train_new_id = train_raw_filtered.map(id_change)
+    # valid_new_id = val_raw_filtered.map(id_change)
 
 
-    train_dataset = DefactifyMultiClassDataset(train_new_id)
-    validation_dataset = DefactifyMultiClassDataset(valid_new_id)
+    train_dataset = DefactifyMultiClassDataset(new_train_dataset)
+    validation_dataset = DefactifyMultiClassDataset(val_raw)
 
     
 
@@ -115,18 +122,18 @@ def create_generator_task_eval_dataloader(
     batch_size: int = 16,
 ) -> Tuple[DataLoader, DataLoader]:
 
-    val_raw_filtered = val_raw.filter(lambda example: example["Label_B"] != 0)
-    test_raw_filtered = test_raw.filter(lambda example: example["Label_B"] != 0)
+    # val_raw_filtered = val_raw.filter(lambda example: example["Label_B"] != 0)
+    # test_raw_filtered = test_raw.filter(lambda example: example["Label_B"] != 0)
     
-    def id_change(example):
-        example["Label_B"] = example["Label_B"] - 1
-        return example
+    # def id_change(example):
+    #     example["Label_B"] = example["Label_B"] - 1
+    #     return example
 
-    val_new_id = val_raw_filtered.map(id_change)
-    test_new_id = test_raw_filtered.map(id_change)
+    # val_new_id = val_raw_filtered.map(id_change)
+    # test_new_id = test_raw_filtered.map(id_change)
 
-    validation_dataset = DefactifyMultiClassDataset(val_new_id)
-    test_dataset = DefactifyMultiClassDataset(test_new_id)
+    validation_dataset = DefactifyMultiClassDataset(val_raw)
+    test_dataset = DefactifyMultiClassDataset(new_test_dataset)
 
     validation_dataloader = DataLoader(
         validation_dataset,

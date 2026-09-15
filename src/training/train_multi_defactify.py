@@ -2,7 +2,6 @@ import torch
 import torch.nn as nn
 from data.dataloader_defactify import create_generator_task_dataloader
 from models.detector import create_defactify_generator_model
-import pickle
 from tqdm import tqdm
 from pathlib import Path
 import json
@@ -11,11 +10,11 @@ project_root = Path.cwd()
 
 path_name = project_root.parent
 
-best_val_cp = "multi_task_defactify_best_validation.pth"
+best_val_cp = "multi_task__AdamW_with_new_split_best_validation.pth"
 
-last_cp = "multi_task_defactify_last_checkpoint.pth"
+last_cp = "multi_task_with_AdamW_new_split_last_checkpoint.pth"
 
-hist_file_name = "history_multi_task.json"
+hist_file_name = "history_AdamW_multi_task_with_new_split_.json"
 
 
 def train_one_epoch(model, device, train_dataloader, criterion, optimizer, epoch):
@@ -105,7 +104,7 @@ def main(epochs: int):
 
     criterion = nn.CrossEntropyLoss()
 
-    optimizer = torch.optim.Adam([
+    optimizer = torch.optim.AdamW([
         {
         "params": model.layer4.parameters(),
         "lr": 1e-4
@@ -217,4 +216,4 @@ def main(epochs: int):
                             json.dump(history, file, indent=4)
     
 if __name__ == "__main__":
-    main(epochs=4)
+    main(epochs=5)

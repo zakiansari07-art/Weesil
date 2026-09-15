@@ -21,6 +21,6 @@ COPY app ./app
 COPY models ./models
 
 # Hugging Face Spaces expects the application on port 7860
-EXPOSE 7860
+EXPOSE 8000
 
-CMD ["sh", "-c", "uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-7860}"]
+CMD ["sh", "-c", "uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000}"]

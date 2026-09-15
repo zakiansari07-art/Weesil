@@ -43,7 +43,7 @@ def create_defactify_generator_model():
     # 1000 classes → 1 output
     model.fc = nn.Linear(
         model.fc.in_features,
-        5
+        6
     )
 
     return model

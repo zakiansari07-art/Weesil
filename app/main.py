@@ -1,12 +1,13 @@
 import shutil
-import traceback
 import tempfile
+import logging
 from contextlib import asynccontextmanager
 from pathlib import Path
-from fastapi.responses import JSONResponse
 
 from fastapi import FastAPI, File, HTTPException, UploadFile
+from fastapi.responses import JSONResponse
 from PIL import UnidentifiedImageError
+from sqlalchemy.exc import SQLAlchemyError
 
 from app.configs.config import (
     ATTRIBUTOR_CHECKPOINT_PATH,
@@ -15,32 +16,22 @@ from app.configs.config import (
 from app.schemas.predictions import AnalysisResult
 from app.services.analysis_service import AnalysisService
 from app.repositories.analysis_repository import AnalysisRepository
-from app.database.database import Base, engine
-import markdown
- 
-from app.database.database import SessionLocal
-from app.frontend.gradio_improved import demo
-import gradio as gr
-from sqlalchemy.exc import SQLAlchemyError
-import logging
+from app.database.database import Base, engine, SessionLocal
+
 
 logger = logging.getLogger(__name__)
 
 
-
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    
-    
-    
-    # Models load once when the API starts—not for every uploaded image.
+    # Load the models once when the API starts, not for every uploaded image.
     app.state.analysis_service = AnalysisService(
         detector_checkpoint_path=str(DETECTOR_CHECKPOINT_PATH),
-        attributor_checkpoint_path=str(ATTRIBUTOR_CHECKPOINT_PATH))
+        attributor_checkpoint_path=str(ATTRIBUTOR_CHECKPOINT_PATH),
+    )
 
     Base.metadata.create_all(bind=engine)
-  
-    
+
     yield
 
 
@@ -54,11 +45,16 @@ app = FastAPI(
 
 @app.exception_handler(Exception)
 async def global_exception_handler(request, exc):
-    logger.exception("UNHANDLED ERROR on %s %s", request.method, request.url.path)
+    logger.exception(
+        "UNHANDLED ERROR on %s %s",
+        request.method,
+        request.url.path,
+    )
     return JSONResponse(
         status_code=500,
         content={"detail": "Internal server error"},
     )
+
 
 @app.get("/health")
 def health_check():
@@ -73,7 +69,7 @@ def analyze_image(file: UploadFile = File(...)):
             detail="Please upload an image file.",
         )
 
-    suffix = Path(file.filename or "upload.png").suffix
+    suffix = Path(file.filename or "upload.png").suffix or ".png"
     temp_path = None
     db = SessionLocal()
 
@@ -85,16 +81,15 @@ def analyze_image(file: UploadFile = File(...)):
             shutil.copyfileobj(file.file, temporary_file)
             temp_path = Path(temporary_file.name)
 
-       
         result = app.state.analysis_service.analyze(str(temp_path))
 
         repository = AnalysisRepository(db=db)
-        repository.save(image_file_name=Path(file.filename or "upload").name, result=result)
+        repository.save(
+            image_file_name=Path(file.filename or "upload").name,
+            result=result,
+        )
 
         return result
-
-
-
 
     except (UnidentifiedImageError, OSError) as error:
         raise HTTPException(
@@ -104,11 +99,10 @@ def analyze_image(file: UploadFile = File(...)):
 
     except SQLAlchemyError as error:
         db.rollback()
-        import traceback
-        traceback.print_exc()
+        logger.exception("DATABASE ERROR during image analysis")
         raise HTTPException(
             status_code=500,
-            detail=f"Database error: {error}",
+            detail="Database error while saving the analysis.",
         ) from error
 
     except Exception as error:
@@ -124,5 +118,3 @@ def analyze_image(file: UploadFile = File(...)):
 
         if temp_path and temp_path.exists():
             temp_path.unlink()
-
-app = gr.mount_gradio_app(app, demo, path="/")
