@@ -7,16 +7,15 @@ from pathlib import Path
 from fastapi import FastAPI, File, HTTPException, UploadFile
 from fastapi.responses import JSONResponse
 from PIL import UnidentifiedImageError
-from sqlalchemy.exc import SQLAlchemyError
+
 
 from app.configs.config import (
     ATTRIBUTOR_CHECKPOINT_PATH,
-    DETECTOR_CHECKPOINT_PATH,
+    
 )
 from app.schemas.predictions import AnalysisResult
 from app.services.analysis_service import AnalysisService
-from app.repositories.analysis_repository import AnalysisRepository
-from app.database.database import Base, engine, SessionLocal
+
 
 
 logger = logging.getLogger(__name__)
@@ -26,11 +25,11 @@ logger = logging.getLogger(__name__)
 async def lifespan(app: FastAPI):
     # Load the models once when the API starts, not for every uploaded image.
     app.state.analysis_service = AnalysisService(
-        detector_checkpoint_path=str(DETECTOR_CHECKPOINT_PATH),
-        attributor_checkpoint_path=str(ATTRIBUTOR_CHECKPOINT_PATH),
+        
+        attributor_checkpoint_path=str(ATTRIBUTOR_CHECKPOINT_PATH)
     )
 
-    Base.metadata.create_all(bind=engine)
+
 
     yield
 
@@ -71,7 +70,7 @@ def analyze_image(file: UploadFile = File(...)):
 
     suffix = Path(file.filename or "upload.png").suffix or ".png"
     temp_path = None
-    db = SessionLocal()
+    
 
     try:
         with tempfile.NamedTemporaryFile(
@@ -83,11 +82,7 @@ def analyze_image(file: UploadFile = File(...)):
 
         result = app.state.analysis_service.analyze(str(temp_path))
 
-        repository = AnalysisRepository(db=db)
-        repository.save(
-            image_file_name=Path(file.filename or "upload").name,
-            result=result,
-        )
+        
 
         return result
 
@@ -97,13 +92,7 @@ def analyze_image(file: UploadFile = File(...)):
             detail="The uploaded file could not be read as an image.",
         ) from error
 
-    except SQLAlchemyError as error:
-        db.rollback()
-        logger.exception("DATABASE ERROR during image analysis")
-        raise HTTPException(
-            status_code=500,
-            detail="Database error while saving the analysis.",
-        ) from error
+   
 
     except Exception as error:
         logger.exception("ANALYZE FAILED")
@@ -113,7 +102,6 @@ def analyze_image(file: UploadFile = File(...)):
         ) from error
 
     finally:
-        db.close()
         file.file.close()
 
         if temp_path and temp_path.exists():

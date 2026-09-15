@@ -4,23 +4,14 @@ from pydantic import BaseModel, Field
 
 
 # ============================================================
-# EXISTING TYPES
+# VERDICT
 # ============================================================
 
 Verdict = Literal[
     "likely_real",
     "likely_ai_generated",
+    
 ]
-
-ConfidenceLevel = Literal[
-    "Very_High",
-    "High",
-    "Medium",
-    "Low",
-    "Very_Low",
-    "not_applicable"
-]
-
 
 
 # ============================================================
@@ -28,7 +19,7 @@ ConfidenceLevel = Literal[
 # ============================================================
 
 class ModelPrediction(BaseModel):
-    label: str | None
+    label: str | None = None
     confidence: float = Field(ge=0, le=1)
     probabilities: dict[str, float]
     model_name: str
@@ -81,9 +72,7 @@ class C2PAManifest(BaseModel):
     title: str | None = None
     format: str | None = None
     claim_generator: str | None = None
-
-    signature: C2PASignature
-
+    signature: C2PASignature | None = None
     actions: list[C2PAAction] = []
     ingredients: list[C2PAIngredient] = []
 
@@ -141,7 +130,6 @@ class ColorReport(BaseModel):
 
 class QualityReport(BaseModel):
     sharpness_score: float
-    blur_score: float
     contrast: float
     entropy: float
 
@@ -245,19 +233,44 @@ class DoubleCompressionReport(BaseModel):
 # ============================================================
 
 class ResizingReport(BaseModel):
-    common_dimension_detected: bool
     reconstruction_error: float
+
+
 # ============================================================
-# FileReport
+# DESCRIPTIVE FEATURES
 # ============================================================
 
+class DescriptiveFeatures(BaseModel):
+    mean_rgb: list[float] = Field(
+        min_length=3,
+        max_length=3
+    )
+
+    std_rgb: list[float] = Field(
+        min_length=3,
+        max_length=3
+    )
+
+    mean_saturation: float
+    mean_brightness: float
+    edge_density: float
+    edge_mean: float
+    file_size_bytes: int
+    aspect_ratio: float
+
+
+# ============================================================
+# FILE
+# ============================================================
 
 class FileReport(BaseModel):
     file_name: str
     file_size_bytes: int
     file_format: str | None
+
+
 # ============================================================
-# ImageReport
+# IMAGE
 # ============================================================
 
 class ImageReport(BaseModel):
@@ -267,8 +280,6 @@ class ImageReport(BaseModel):
     aspect_ratio: float
 
 
-
-
 # ============================================================
 # COMPLETE FORENSICS REPORT
 # ============================================================
@@ -276,8 +287,6 @@ class ImageReport(BaseModel):
 class ForensicsReport(BaseModel):
     file: FileReport
     image: ImageReport
-
-    metadata: ProvenanceReport
 
     color: ColorReport
     quality: QualityReport
@@ -290,12 +299,17 @@ class ForensicsReport(BaseModel):
     double_compression: DoubleCompressionReport
     resizing: ResizingReport
 
+    descriptive_features: DescriptiveFeatures
+
+    # The current analyzer also returns provenance separately.
+    provenance: ProvenanceReport
+
+
 # ============================================================
 # COMPLETE ANALYSIS RESULT
 # ============================================================
 
 class AnalysisResult(BaseModel):
-
     verdict: Verdict
 
     confidence: float | None = Field(
@@ -304,22 +318,14 @@ class AnalysisResult(BaseModel):
         le=1
     )
 
-    confidence_level: ConfidenceLevel
-
     likely_generator: str | None = None
 
-    generator_confidence: float | None = Field(
-        default=None,
-        ge=0,
-        le=1
-    )
+    probabilities: dict[str, float]
 
     explanation: str
 
     llm_report: str | None = None
 
-    real_vs_ai: ModelPrediction
-
-    generator_attribution: ModelPrediction
+    model_predictions: ModelPrediction
 
     forensics: ForensicsReport

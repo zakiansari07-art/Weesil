@@ -79,10 +79,6 @@ class ImageForensicsAnalyzer:
 
         sharpness_score = float(laplacian.var())
 
-        # Blur score:
-        # Higher value generally means sharper image.
-        blur_score = sharpness_score
-
         # Contrast
         contrast = float(grayscale.std())
 
@@ -196,8 +192,6 @@ class ImageForensicsAnalyzer:
                 "aspect_ratio": round(float(aspect_ratio), 4)
             },
 
-            "metadata": provenance
-            ,
 
             "color": {
                 "mean_rgb": [
@@ -226,17 +220,10 @@ class ImageForensicsAnalyzer:
                     sharpness_score,
                     2
                 ),
-
-                "blur_score": round(
-                    blur_score,
-                    2
-                ),
-
                 "contrast": round(
                     contrast,
                     2
                 ),
-
                 "entropy": round(
                     entropy,
                     4
@@ -293,6 +280,23 @@ class ImageForensicsAnalyzer:
             "double_compression": double_compression,
 
             "resizing": resizing,
+
+            # These are descriptive image characteristics. They are not
+            # treated as evidence of AI generation or manipulation.
+            "descriptive_features": {
+                "mean_rgb": [
+                    round(float(x), 2) for x in mean_rgb
+                ],
+                "std_rgb": [
+                    round(float(x), 2) for x in std_rgb
+                ],
+                "mean_saturation": round(mean_saturation, 2),
+                "mean_brightness": round(mean_brightness, 2),
+                "edge_density": round(edge_density, 6),
+                "edge_mean": round(edge_mean, 4),
+                "file_size_bytes": file_size,
+                "aspect_ratio": round(float(aspect_ratio), 4)
+            },
 
             "provenance": provenance
         }
@@ -981,28 +985,6 @@ class ImageForensicsAnalyzer:
         actually occurred.
         """
 
-        common_dimensions = {
-            256,
-            384,
-            512,
-            640,
-            768,
-            1024,
-            1280,
-            1536,
-            1920,
-            2048,
-            2560,
-            3072,
-            3840,
-            4096
-        }
-
-        dimension_match = (
-            width in common_dimensions
-            or height in common_dimensions
-        )
-
         # Edge preservation after down/up sampling
         image = grayscale.astype(
             np.float32
@@ -1032,10 +1014,8 @@ class ImageForensicsAnalyzer:
         )
 
         return {
-            "common_dimension_detected": bool(
-                dimension_match
-            ),
-
+            # A common dimension is not evidence of AI generation or
+            # manipulation; retain only the measurable reconstruction clue.
             "reconstruction_error": round(
                 reconstruction_error,
                 4

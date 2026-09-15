@@ -7,7 +7,7 @@ from torchvision import transforms
 from models.detector import create_defactify_generator_model
 
 
-GENERATOR_LABELS  = ["SD21", "SDXL", "SD3", "DALLE3", "Midjourney"]
+GENERATOR_LABELS  = ["Real", "SD21", "SDXL", "SD3", "DALLE3", "Midjourney"]
 
 
 
@@ -77,5 +77,5 @@ class GeneratorAttributor:
             "label": best_label,
             "confidence": round(confidence, 4),
             "probabilities": probabilities_by_label,
-            "model_name": "resnet18_generator_attributor",
+            "model_name": "resnet18",
         }

@@ -21,7 +21,7 @@ ATTRIBUTOR_CHECKPOINT_PATH = (
     PROJECT_ROOT
     / "models"
     / "best_models_checkpoint"
-    / "multi_task_defactify_last_checkpoint.pth"
+    / "multi_task__AdamW_with_new_split_best_validation.pth"
 )
 
 
