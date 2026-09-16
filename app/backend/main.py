@@ -10,7 +10,7 @@ from PIL import UnidentifiedImageError
 
 
 from app.configs.config import (
-    ATTRIBUTOR_CHECKPOINT_PATH,
+    ATTRIBUTOR_CHECKPOINT_PATH
     
 )
 from app.schemas.predictions import AnalysisResult

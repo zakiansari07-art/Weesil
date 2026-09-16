@@ -36,7 +36,7 @@ def create_generator_model():
 def create_defactify_generator_model():
 
     model = resnet18(
-        weights=ResNet18_Weights.DEFAULT
+        weights=None
     )
 
     # Replace the original ImageNet classifier

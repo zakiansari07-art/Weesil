@@ -21,7 +21,7 @@ with open(LOGO_PATH, "rb") as logo_file:
 
 API_URL = os.getenv(
     "IMAGETRUST_API_URL",
-    "http://127.0.0.1:8000",
+    
 ).rstrip("/")
 
 ANALYZE_URL = f"{API_URL}/analyze"

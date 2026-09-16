@@ -3,19 +3,17 @@ langgraph
 langchain-core
 langchain-openai
 pydantic
-gradio==5.49.1
 fastapi
 uvicorn[standard]
 python-multipart
 Pillow
-opencv-python
-sqlalchemy
+opencv-python-headless
 psycopg[binary]
 python-dotenv
-requests
 c2pa-python
 markdown
-streamlit
+requests
+
 --extra-index-url https://download.pytorch.org/whl/cpu
 torch==2.11.0
 torchvision==0.26.0
