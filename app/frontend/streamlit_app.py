@@ -9,7 +9,7 @@ import requests
 import streamlit as st
 from pathlib import Path
 
-LOGO_PATH = Path(__file__).parent / "assets" / "imagetrust-logo.png"
+LOGO_PATH = Path(__file__).parent / "assets" / "new_logo.png"
 
 with open(LOGO_PATH, "rb") as logo_file:
     logo_b64 = base64.b64encode(logo_file.read()).decode("utf-8")
@@ -21,6 +21,7 @@ with open(LOGO_PATH, "rb") as logo_file:
 
 API_URL = os.getenv(
     "IMAGETRUST_API_URL",
+    "http://127.0.0.1:8000"
     
 ).rstrip("/")
 
