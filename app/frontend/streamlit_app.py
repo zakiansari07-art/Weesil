@@ -9,7 +9,7 @@ import requests
 import streamlit as st
 from pathlib import Path
 
-LOGO_PATH = Path(__file__).parent / "assets" / "new_logo.png"
+LOGO_PATH = Path(__file__).parent / "assets" / "logo_persona.png"
 
 with open(LOGO_PATH, "rb") as logo_file:
     logo_b64 = base64.b64encode(logo_file.read()).decode("utf-8")
@@ -21,7 +21,7 @@ with open(LOGO_PATH, "rb") as logo_file:
 
 API_URL = os.getenv(
     "IMAGETRUST_API_URL",
-    "http://127.0.0.1:8000"
+    "http://127.0.0.1:8000" 
     
 ).rstrip("/")
 
@@ -34,13 +34,29 @@ HEALTH_URL = f"{API_URL}/health"
 # ---------------------------------------------------------------------
 
 st.set_page_config(
-    page_title="ImageTrust — AI Image Forensics",
+    page_title="Weesil — AI Image Detection and Forensics",
     page_icon="IT",
     layout="wide",
     initial_sidebar_state="collapsed",
 )
 
-
+st.markdown(
+    """
+    <style>
+    /* Hides the top decorative color strip */
+    div[data-testid="stDecoration"] {
+        display: none;
+    }
+    
+    /* Optional: Hides the entire header area (including menu and status) */
+    header[data-testid="stHeader"] {
+        background-color: rgba(0,0,0,0);
+        color: rgba(0,0,0,0);
+    }
+    </style>
+    """,
+    unsafe_allow_html=True
+)
 # ---------------------------------------------------------------------
 # Styling
 # ---------------------------------------------------------------------
@@ -942,7 +958,7 @@ def analyze_image(uploaded_file) -> dict:
 def api_error_message(error: Exception) -> str:
     if isinstance(error, requests.ConnectionError):
         return (
-            f"Could not connect to the ImageTrust API at "
+            f"Could not connect to the Weesil API at "
             f"`{ANALYZE_URL}`. Make sure FastAPI is running."
         )
 
@@ -976,7 +992,7 @@ st.markdown(
         <h1>See the <span class="accent">truth behind</span><br>every image.</h1>
         <p>
             Detect AI-generated images, identify their likely source, and
-            uncover forensic details — with ImageTrust.
+            uncover forensic details — with Weesil.
         </p>
     </div>
 
@@ -1003,7 +1019,7 @@ with left:
             <div class="card-kicker">Image analysis</div>
             <div class="card-title">Analyze an image</div>
             <div class="card-copy">
-                Supported image formats are accepted. ImageTrust will run the
+                Supported image formats are accepted. Weesil will run the
                 detector and, when appropriate, generator attribution models.
             </div>
         """,
@@ -1043,7 +1059,7 @@ with right:
                 <div class="empty-icon">↑</div>
                 <div class="empty-title">Ready for analysis</div>
                 <div class="empty-copy">
-                    Upload an image to see its ImageTrust assessment and
+                    Upload an image to see its Weesil assessment and
                     supporting model results.
                 </div>
             </div>
@@ -1057,7 +1073,7 @@ with right:
 # ---------------------------------------------------------------------
 
 if analyze_clicked and uploaded_file is not None:
-    with st.spinner("Analyzing image with ImageTrust models..."):
+    with st.spinner("Analyzing the image  ...."):
         try:
             st.session_state["analysis_result"] = analyze_image(uploaded_file)
             st.session_state["analysis_filename"] = uploaded_file.name
@@ -1162,7 +1178,7 @@ if result:
             <div class="verdict-main">
                 <div class="verdict-icon">{verdict_icon}</div>
                 <div>
-                    <div class="eyebrow">ImageTrust assessment</div>
+                    <div class="eyebrow">Assessment</div>
                     <div class="verdict-title">{html.escape(verdict)}</div>
                     <div class="verdict-subtitle">{html.escape(verdict_subtitle)}</div>
                 </div>
@@ -1480,7 +1496,7 @@ if result:
             <div class="report-header">
                 <div class="report-icon">IT</div>
                 <div>
-                    <div class="report-title">ImageTrust Assessment</div>
+                    <div class="report-title">Assessment</div>
                     <div class="report-subtitle">Automated evidence synthesis</div>
                 </div>
             </div>
@@ -1511,7 +1527,7 @@ if result:
 st.markdown(
     """
     <div class="footer">
-        ImageTrust · AI Image Detection · Generator Attribution · Digital Forensics · Provenance Analysis
+        Weesil · AI Image Detection · Generator Attribution · Digital Forensics · Provenance Analysis
     </div>
     """,
     unsafe_allow_html=True,
