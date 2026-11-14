@@ -1,64 +1,76 @@
-# ImageTrust
+# Weesil
 
-### AI Image Detection · Generator Attribution · Digital Forensics · Provenance Analysis
+### AI Image Detection · Generator Classification · Digital Forensics · Provenance Analysis
 
-ImageTrust is an AI image forensics platform designed to assess whether an image is **likely real or likely AI-generated**, identify the **most likely supported AI generator**, and provide supporting evidence through traditional digital forensics and provenance analysis.
+Weesil is an AI image forensics platform designed to assess an image using a **single multiclass deep-learning classifier**. The model predicts the class that the image most closely matches, including **Real** and supported AI-generator classes such as **Midjourney, Stable Diffusion, and DALL·E**.
 
-The system combines two dedicated deep-learning models with OpenCV/Pillow-based forensic analysis, EXIF/XMP/C2PA inspection, and an LLM-powered evidence report.
+The model prediction is complemented by traditional digital forensics, metadata/provenance inspection, and an LLM-powered evidence report.
 
-> **ImageTrust is an evidence-based analysis tool, not an absolute authenticity verifier.**
+> **Weesil is an evidence-based analysis tool, not an absolute authenticity verifier.**
 
 <p align="center">
-  <a href="http://13.53.217.40/"><strong>Live Demo →</strong></a>
+  <a href="https://weesil.com/"><strong>Live Demo →</strong></a>
   &nbsp;&nbsp;|&nbsp;&nbsp;
-  <a href="https://youtu.be/qlTO-ERLtf4"><strong>Watch Demo Video →</strong></a>
+  <a href="https://youtu.be/6vA5Qyj-kzg"><strong>Watch Demo Video →</strong></a>
 </p>
 
 ---
 
-## Demo
+# Demo
 
-### Live Application
+## Live Application
 
-**[Try ImageTrust Live →](http://13.53.217.40/)**
+**[Try Weesil Live →](https://weesil.com/)**
 
-ImageTrust is deployed on an **AWS EC2 instance** and exposed through its Gradio interface.
-
+Weesil is deployed on an **AWS EC2 instance** and exposed through its Streamlit interface.
 
 ### Product Demo Video
 
-**[▶ Watch the ImageTrust Demo](https://youtu.be/qlTO-ERLtf4)**
+**[▶ Watch the Weesil Demo](https://youtu.be/6vA5Qyj-kzg)**
 
 The demo showcases:
 
 1. Image upload
-2. Real vs AI classification
-3. Classification confidence
-4. Generator attribution
-5. Attribution confidence level
-6. Digital forensic analysis
-7. EXIF/XMP/C2PA analysis
-8. Automated evidence report
-
+2. Multiclass image classification
+3. Predicted class and confidence
+4. Digital forensic analysis
+5. Provenance analysis
+6. Automated evidence report
+7. API structure
 
 ### Interface
 
-![ImageTrust Interface](assets/ui.png)
+![Weesil Interface](assets/ui.png)
+
 ---
 
-### Analysis Report
+### Key Findings and Provenance
 
-![ImageTrust Analysis Report](assets/analysis_report.png)
+![Weesil Analysis Report](assets/findings_provenance.png)
+
 ---
 
-### Forensic Analysis Json
+### Forensics
 
-![Forensic Analysis Json](assets/forensic_analysis_json.png)
+![Weesil Analysis Report](assets/forensics.png)
+
 ---
 
-### Model Analysis Json
+### Report
 
-![Model Analysis Json](assets/model_analysis_json.png)
+![Weesil Analysis Report](assets/report.png)
+
+---
+
+### Forensic Analysis JSON
+
+![Forensic Analysis JSON](assets/forensic_analysis_json.png)
+
+---
+
+### Model Analysis JSON
+
+![Model Analysis JSON](assets/model_analysis_json.png)
 
 ---
 
@@ -66,80 +78,58 @@ The demo showcases:
 
 AI-generated images are becoming increasingly difficult to distinguish from authentic photographs through visual inspection alone.
 
-ImageTrust approaches this problem as a **multi-signal image forensics task** rather than relying on a single classifier.
+Weesil approaches this problem as a **multi-signal image forensics task**. The core machine-learning component is a **single multiclass image classifier** that predicts the class an image most closely resembles.
 
-The platform evaluates:
+The platform combines:
 
-- Whether an image is likely real or AI-generated
-- Which supported generator the image most closely resembles
-- Traditional image-forensic characteristics
-- Embedded metadata and provenance
-- Combined evidence supporting the final assessment
+- A multiclass deep-learning image classifier
+- Traditional image-forensic measurements
+- Embedded metadata and provenance inspection
+- Structured analysis and decision logic
+- An LLM-powered evidence report
 
-The final user-facing classification has two states:
-
-- **Likely Real**
-- **Likely AI-Generated**
-
-For AI-generated images, ImageTrust additionally reports the most likely supported generator and a qualitative attribution confidence level.
+The classifier can distinguish between **Real** images and supported AI-generated classes. Generator predictions are model classifications rather than proof of origin.
 
 ---
 
 # Key Features
 
-## 1. Real vs AI Detection
+## 1. Multiclass Image Classification
 
-ImageTrust uses a dedicated deep-learning classifier to distinguish between real and AI-generated images.
+Weesil currently uses **one machine-learning model** for image classification.
 
-The current detector uses a **ResNet18-based architecture**.
+The model predicts one of the supported classes, for example:
 
-The model produces class probabilities which are used by the decision engine to determine the final classification.
+```text
+Real
+Midjourney
+Stable Diffusion 2.1
+Stable Diffusion XL
+Stable Diffusion 3
+DALL·E 3
+```
+
+The model produces a probability distribution across the supported classes. The highest-probability class is used as the primary model prediction.
 
 Example:
 
 ```text
-Classification
-──────────────
-Likely AI-Generated
+Model Prediction
+────────────────
+Midjourney
 
 Confidence
 ──────────
-81.34%
+93.19%
 ```
 
----
-
-## 2. AI Generator Attribution
-
-For images classified as likely AI-generated, ImageTrust attempts to identify the most likely supported generator.
-
-The current attribution model evaluates generators including:
-
-- Stable Diffusion 2.1
-- Stable Diffusion XL
-- Stable Diffusion 3
-- DALL·E 3
-- Midjourney
-
-Generator attribution also includes a qualitative confidence level:
-
-| Confidence | Interpretation |
-|---|---|
-| **Very High** | Very strong match among supported generators |
-| **High** | Strong generator similarity |
-| **Medium** | Moderate similarity |
-| **Low** | Weak similarity |
-| **Very Low** | Very weak similarity |
-
-Attribution is treated as a **model prediction**, not proof of origin.
-
-A generator outside the supported training classes may be incorrectly attributed to the closest supported class.
+The classifier's prediction should be interpreted as a model-based assessment. A prediction for an AI-generator class does not establish that the image was definitively created by that generator.
 
 ---
 
-## 3. Digital Image Forensics
+## 2. Digital Image Forensics
 
-ImageTrust supplements the ML predictions with traditional forensic analysis using OpenCV, Pillow, and NumPy.
+Weesil supplements the model prediction with traditional forensic analysis using OpenCV, Pillow, and NumPy.
 
 Current analysis includes:
 
@@ -190,9 +180,9 @@ These measurements are supporting signals and are not individually treated as pr
 
 ---
 
-## 4. Metadata & Provenance Analysis
+## 3. Metadata & Provenance Analysis
 
-ImageTrust analyzes available embedded metadata and provenance information.
+Weesil analyzes available embedded metadata and provenance information.
 
 ### EXIF
 
@@ -211,7 +201,7 @@ XMP metadata is inspected for additional embedded information.
 
 ### C2PA
 
-ImageTrust checks for **C2PA manifests** when available.
+Weesil checks for **C2PA manifests** when available.
 
 C2PA can provide digitally signed provenance information associated with an image.
 
@@ -221,45 +211,46 @@ Metadata may be removed, modified, or lost during image processing.
 
 ---
 
-## 5. Evidence-Based LLM Report
+## 4. Evidence-Based LLM Report
 
-After the analysis is complete, ImageTrust generates a concise natural-language report.
+After the analysis is complete, Weesil generates a concise natural-language report.
 
-The report summarizes:
+The report can summarize:
 
-- Final classification
-- Detector confidence
-- Generator attribution
-- Attribution confidence
+- Model prediction
+- Model confidence
 - Provenance information
 - Important forensic signals
-- Final conclusion
+- Supporting evidence
+- Final assessment
 
-The LLM does **not** make the final authenticity decision.
+The LLM does **not** independently classify the image. It receives structured analysis produced by the application and turns that information into a human-readable report.
 
 ```text
-ML Models
-    │
-    ▼
-Forensics
-    │
-    ▼
-Provenance
-    │
-    ▼
-Deterministic Decision Engine
-    │
-    ▼
-Structured Analysis
-    │
-    ▼
-LLM
-    │
-    ▼
-Human-readable Report
+Image
+  │
+  ▼
+Multiclass ML Classifier
+  │
+  ├───────────────┐
+  │               │
+  ▼               ▼
+Model Output    Forensics
+  │               │
+  └───────┬───────┘
+          │
+          ▼
+     Provenance
+          │
+          ▼
+ Structured Analysis
+          │
+          ▼
+          LLM
+          │
+          ▼
+ Human-readable Report
 ```
-
-This keeps the final classification grounded in structured analysis rather than an LLM's independent judgment.
 
 ---
 
@@ -272,6 +263,18 @@ This keeps the final classification grounded in structured analysis rather than 
                                    │
                                    ▼
                          ┌───────────────────┐
+                         │    Streamlit      │
+                         │    Frontend       │
+                         └─────────┬─────────┘
+                                   │ HTTP
+                                   ▼
+                         ┌───────────────────┐
+                         │     FastAPI       │
+                         │      :8000        │
+                         └─────────┬─────────┘
+                                   │
+                                   ▼
+                         ┌───────────────────┐
                          │    LangGraph      │
                          │ Analysis Workflow │
                          └─────────┬─────────┘
@@ -279,46 +282,57 @@ This keeps the final classification grounded in structured analysis rather than 
               ┌────────────────────┼────────────────────┐
               │                    │                    │
               ▼                    ▼                    ▼
-     ┌────────────────┐   ┌──────────────────┐  ┌─────────────────┐
-     │ Real vs AI     │   │ Generator        │  │ Digital         │
-     │ Detector       │   │ Attribution      │  │ Forensics       │
-     │                │   │                  │  │                 │
-     │ ResNet18       │   │ ResNet18         │  │ OpenCV/Pillow   │
-     └───────┬────────┘   └─────────┬────────┘  └────────┬────────┘
-             │                      │                    │
-             │                      │             ┌──────┴───────┐
-             │                      │             │              │
-             │                      │            EXIF       XMP/C2PA
-             │                      │
-             └──────────────────────┼────────────────────┘
-                                    │
-                                    ▼
+     ┌─────────────────┐  ┌──────────────────┐  ┌─────────────────┐
+     │ Multiclass      │  │ Digital          │  │ Provenance      │
+     │ AI Classifier   │  │ Forensics        │  │ Analysis        │
+     │                 │  │                  │  │                 │
+     │ ResNet18        │  │ OpenCV/Pillow    │  │ EXIF/XMP/C2PA   │
+     └────────┬────────┘  └────────┬─────────┘  └────────┬────────┘
+              │                    │                    │
+              └────────────────────┼────────────────────┘
+                                   │
+                                   ▼
                          ┌───────────────────┐
-                         │  Decision Engine  │
+                         │ Structured        │
+                         │ Analysis          │
                          └─────────┬─────────┘
                                    │
-                    ┌──────────────┴──────────────┐
-                    │                             │
-                    ▼                             ▼
-             ┌─────────────┐             ┌──────────────────┐
-             │ Likely Real │             │ Likely AI        │
-             └─────────────┘             │ Generated        │
-                                          └────────┬─────────┘
-                                                   │
-                                                   ▼
-                                          Generator Attribution
-                                                   │
-                                                   ▼
-                                          ┌──────────────────┐
-                                          │ LLM Report       │
-                                          │ Generation       │
-                                          └────────┬─────────┘
-                                                   │
-                                                   ▼
-                                          ┌──────────────────┐
-                                          │ Gradio Interface │
-                                          └──────────────────┘
+                                   ▼
+                         ┌───────────────────┐
+                         │ LLM Report        │
+                         │ Generation        │
+                         └─────────┬─────────┘
+                                   │
+                                   ▼
+                         ┌───────────────────┐
+                         │ Streamlit UI      │
+                         └───────────────────┘
 ```
+
+## Production Deployment Flow
+
+The current public deployment follows this infrastructure path:
+
+```text
+Browser
+   ↓ HTTPS
+Cloudflare
+   ↓
+AWS Elastic IP
+   ↓
+Nginx :443
+   ↓
+Docker Compose
+   ├── Streamlit :8501
+   │       ↓
+   │   FastAPI :8000
+   │       ↓
+   │   AI Model (.pth)
+   │
+   └── Environment (.env)
+```
+
+This separates the public HTTPS entry point from the application containers while keeping the trained model inside the backend inference service.
 
 ---
 
@@ -326,154 +340,69 @@ This keeps the final classification grounded in structured analysis rather than 
 
 ## Step 1 — Image Upload
 
-The user uploads an image through the Gradio interface.
+The user uploads an image through the Streamlit interface.
 
-The original image is passed to the backend for analysis.
+The original image is sent to the FastAPI backend for analysis.
 
-## Step 2 — Real vs AI Detection
+## Step 2 — Multiclass Model Prediction
 
-The first model estimates whether the image is real or AI-generated.
+The single trained classifier processes the image and produces probabilities for all supported classes.
 
-## Step 3 — Generator Attribution
+The highest-probability class becomes the primary model prediction.
 
-For images classified as likely AI-generated, the attribution model predicts the closest supported generator and provides a confidence level.
+## Step 3 — Digital Forensics
 
-## Step 4 — Digital Forensics
+Traditional forensic measurements are calculated independently from the model prediction.
 
-Traditional forensic measurements are calculated independently from the ML predictions.
-
-## Step 5 — Provenance Analysis
+## Step 4 — Provenance Analysis
 
 EXIF, XMP, and C2PA information is inspected when available.
 
-## Step 6 — Deterministic Decision
+## Step 5 — Structured Analysis
 
-The decision engine uses the structured model outputs and configured thresholds to produce the final classification:
+The model prediction, confidence, forensic measurements, and provenance information are assembled into a structured analysis result.
 
-```text
-Likely Real
-       or
-Likely AI-Generated
-```
+## Step 6 — Evidence Report
 
-## Step 7 — Evidence Report
-
-The structured analysis is passed to the LLM, which produces a concise explanation of the evidence.
+The structured analysis is passed to the LLM, which produces a concise explanation of the available evidence.
 
 ---
 
 # Model Evaluation
 
-ImageTrust contains **two independently evaluated machine-learning models**.
+Weesil currently uses **one multiclass image-classification model**.
 
----
-
-## Real vs AI Detector Performance
+## Multiclass Classifier
 
 **Architecture:** ResNet18
 
-**Task:** Binary classification
+**Task:** Multiclass classification
 
-**Classes:**
+The classifier predicts across the supported image classes, including:
 
 ```text
 Real
-AI-Generated
+SD21
+SDXL
+SD3
+DALL·E 3
+Midjourney
 ```
 
-### Overall Metrics
+The model produces a probability distribution across these classes and uses the highest-probability class as the primary prediction.
 
-| Metric | Score |
-|---|---:|
-| Accuracy | **0.9116** |
-| Precision | **0.9870** |
-| Recall | **0.9058** |
-| F1 Score | **0.9447** |
-| ROC-AUC | **0.9769** |
+### Generator-wise Performance
 
+The model is evaluated using multiple performance metrics across each supported class, including **Accuracy, F1 Score, ROC-AUC, Precision, and Recall**.
 
-### Confusion Matrix
+The chart below is a placeholder for the final evaluation visualization:
 
-![Real vs AI ROC Curve](assets/real-ai-confusion-matrix.png)
+> **TODO:** Add the final generator-wise performance chart to the repository at `assets/generator-performance.png`.
 
+![Generator-wise Performance](assets/generator_performance_chart.png)
 
-### ROC Curve
+The evaluation visualization compares model performance across **Real, SD21, SDXL, SD3, DALL·E 3, and Midjourney**.
 
-![Real vs AI ROC Curve](assets/real-ai-roc-curve.png)
-
-
-
----
-
-# Generator Attribution Performance
-
-The attribution model was evaluated using a **one-vs-rest** approach for each generator.
-
-- **Positive** → The image was generated by the generator being evaluated.
-- **Negative** → The image was generated by another generator.
-
-This evaluation measures how effectively the attribution model distinguishes each generator from all other supported generators.
-
-### Generator Performance Chart
-
-![Generator Attribution Performance](assets/generator-performance.png)
-
-
----
-
-## Generator Attribution Confusion Matrices
-
-Each matrix evaluates one generator against **all other generators**.
-
-### Matrix Interpretation
-
-| Actual ↓ / Predicted → | Other Generators | This Generator |
-|---|---:|---:|
-| **Other Generators** | True Negative (TN) | False Positive (FP) |
-| **This Generator** | False Negative (FN) | True Positive (TP) |
-
-
-<details>
-<summary>View individual confusion matrices</summary>
-
-### SD 2.1
-
-| Actual ↓ / Predicted → | Other Generators | SD 2.1 |
-|---|---:|---:|
-| **Other Generators** | 28,896 | 1,104 |
-| **SD 2.1** | 1,694 | 5,806 |
-
-### SDXL
-
-| Actual ↓ / Predicted → | Other Generators | SDXL |
-|---|---:|---:|
-| **Other Generators** | 29,063 | 937 |
-| **SDXL** | 917 | 6,583 |
-
-### SD 3
-
-| Actual ↓ / Predicted → | Other Generators | SD 3 |
-|---|---:|---:|
-| **Other Generators** | 29,574 | 426 |
-| **SD 3** | 1,418 | 6,082 |
-
-### DALL·E 3
-
-| Actual ↓ / Predicted → | Other Generators | DALL·E 3 |
-|---|---:|---:|
-| **Other Generators** | 29,812 | 188 |
-| **DALL·E 3** | 1,127 | 6,373 |
-
-### Midjourney
-
-| Actual ↓ / Predicted → | Other Generators | Midjourney |
-|---|---:|---:|
-| **Other Generators** | 27,261 | 2,739 |
-| **Midjourney** | 238 | 7,262 |
-
-</details>
-
----
 
 # Technology Stack
 
@@ -488,7 +417,7 @@ Each matrix evaluates one generator against **all other generators**.
 | Workflow Orchestration | LangGraph |
 | LLM Integration | LangChain |
 | LLM | OpenAI |
-| UI | Gradio |
+| UI | Streamlit |
 | Data Validation | Pydantic |
 | Database | SQLAlchemy |
 | Provenance | EXIF / XMP / C2PA |
@@ -498,13 +427,19 @@ Each matrix evaluates one generator against **all other generators**.
 
 # Project Structure
 
-ImageTrust/
+
+```text
+Weesil/
 │
 ├── app/
-│   ├── main.py
+│   ├── __init__.py
+│   │
+│   ├── backend/
+│   │   └── main.py
 │   │
 │   ├── configs/
-│   │   └── config.py
+│   │   ├── config.py
+│   │   └── __init__.py
 │   │
 │   ├── database/
 │   │   ├── database.py
@@ -512,216 +447,189 @@ ImageTrust/
 │   │   └── init_db.py
 │   │
 │   ├── frontend/
-│   │   └── gradio_ui.py
+│   │   ├── streamlit_app.py
+│   │   └── assets/
+│   │       ├── logo_persona.png
+│   │       ├── logo_persona_tagline.png
+│   │       └── new_logo.png
 │   │
 │   ├── models/
 │   │   ├── forensics_analyzer.py
 │   │   ├── generator_attributor.py
 │   │   ├── llm.py
-│   │   └── real_ai_detector.py
-│   │
-│   ├── repositories/
-│   │   └── analysis_repository.py
+│   │   └── __init__.py
 │   │
 │   ├── schemas/
 │   │   └── predictions.py
 │   │
 │   ├── services/
 │   │   ├── analysis_service.py
-│   │   └── analyze_provenance.py
+│   │   ├── analyze_provenance.py
+│   │   └── __init__.py
+│   │
+│   ├── tests/
+│   │   ├── testing.py
+│   │   ├── test_analysis_service.py
+│   │   ├── test_forensics.py
+│   │   └── test_model_inference.py
 │   │
 │   └── workflows/
-│       └── analysis_graph.py
+│       ├── analysis_graph.py
+│       └── __init__.py
+│
+├── assets/
+│   ├── analysis_report.png
+│   ├── forensic_analysis_json.png
+│   ├── generator-performance.png
+│   ├── model_analysis_json.png
+│   ├── real-ai-confusion-matrix.png
+│   ├── real-ai-roc-curve.png
+│   ├── ui.png
+│   ├── ui_element.png
+│   └── ui_with_image.png
+│
+├── data/
+│   ├── dataloader.py
+│   ├── dataloader_defactify.py
+│   ├── dataset.py
+│   ├── dataset_defactify.py
+│   ├── download_dataset.py
+│   ├── test_dataloader.py
+│   └── __init__.py
 │
 ├── models/
-│   └── best_models_checkpoint/
+│   ├── detector.py
+│   └── __init__.py
 │
+├── src/
+│   ├── test_gpu.py
+│   ├── test_model.py
+│   ├── __init__.py
+│   │
+│   ├── evaluation/
+│   │   ├── evaluate.py
+│   │   ├── evaluate_bin.py
+│   │   ├── evaluate_generators.py
+│   │   └── evaluate_generator_model.py
+│   │
+│   └── training/
+│       ├── test_path.py
+│       ├── train.py
+│       ├── train_bin_defactify.py
+│       ├── train_generator_model.py
+│       └── train_multi_defactify.py
 │
-├── Dockerfile
-├── compose.yaml
-├── requirements.txt
-├── requirements-render.txt
+├── tests/
+│   ├── test_dataset.py
+│   └── test_generator.py
+│
 ├── .dockerignore
+├── .gitattributes
 ├── .gitignore
-└── README.md
+├── compose.yaml
+├── Dockerfile.backend
+├── Dockerfile.frontend
+├── LICENSE
+├── README.md
+├── requirements.txt
+├── requirements_backend.txt
+├── requirements_frontend.txt
 ```
 
-> **TODO:** Update this structure to exactly match the final repository.
-
----
-
-# Running Locally
-
-## 1. Clone the Repository
-
-```bash
-git clone YOUR_GITHUB_REPOSITORY_URL
-cd ImageTrust
-```
-
-## 2. Create a Virtual Environment
-
-```bash
-python -m venv .venv
-```
-
-### Windows
-
-```bash
-.venv\Scripts\activate
-```
-
-### Linux / macOS
-
-```bash
-source .venv/bin/activate
-```
-
-## 3. Install Dependencies
-
-```bash
-pip install -r requirements.txt
-```
-
-## 4. Configure Environment Variables
-
-Create a `.env` file:
-
-```env
-POSTGRES_DB=POSTGRES_DB
-POSTGRES_USER=POSTGRES_USER
-POSTGRES_PASSWORD=POSTGRES_PASSWORD
-DATABASE_URL=postgresql+psycopg://POSTGRES_USER:POSTGRES_PASSWORD@db:5432/POSTGRES_DB
-OPENAI_API_KEY=your_openai_api_key
-```
-
-
-
-## 5. Add Model Checkpoints
-
-Place the trained model checkpoints in the required directory.
-
-```text
-models/best_models_checkpoint
-├── bin_task_defactify_best_validation.pth
-└── multi_task_defactify_last_checkpoint.pth
-```
-
-
-## 6. Start the FastAPI Backend
-
-```bash
-uvicorn app.main:app --reload
-```
-
-## 7. Start the Gradio Interface
-
-```bash
-python gradio/gradio_ui.py
-```
+> **Note:** Update the structure above if the final repository layout differs.
 
 ---
 
 # AWS EC2 Deployment
 
-ImageTrust is deployed on an **AWS EC2 instance**.
+Weesil is deployed on an **AWS EC2 instance** using Docker Compose, with Cloudflare and Nginx handling the public HTTPS entry point.
 
-The deployment demonstrates a complete cloud-hosted inference workflow:
+### Production Architecture
 
 ```text
-                         Internet
-                            │
-                            ▼
-                  ┌──────────────────┐
-                  │  Gradio Client   │
-                  └────────┬─────────┘
-                           │ HTTP
-                           ▼
-                  ┌──────────────────┐
-                  │    AWS EC2       │
-                  │                  │
-                  │    FastAPI       │
-                  │       │          │
-                  │       ▼          │
-                  │   LangGraph      │
-                  │       │          │
-                  │       ▼          │
-                  │ ML + Forensics   │
-                  └──────────────────┘
+Browser
+   ↓ HTTPS
+Cloudflare
+   ↓
+AWS Elastic IP
+   ↓
+Nginx :443
+   ↓
+Docker Compose
+   ├── Streamlit :8501
+   │       ↓
+   │   FastAPI :8000
+   │       ↓
+   │   AI Model (.pth)
+   │
+   └── Environment (.env)
 ```
+
+### Deployment Components
+
+- **Browser** — User-facing access to the application
+- **Cloudflare** — DNS, proxying, and HTTPS/TLS
+- **AWS Elastic IP** — Stable public endpoint for the EC2 instance
+- **Nginx :443** — HTTPS reverse proxy
+- **Docker Compose** — Orchestrates the application containers
+- **Streamlit :8501** — Web application frontend
+- **FastAPI :8000** — Backend API and inference service
+- **AI Model (.pth)** — Trained multiclass image-classification checkpoint
+- **`.env`** — Runtime configuration and secrets
 
 The deployment demonstrates:
 
 - AWS EC2 provisioning
-- Linux server configuration
-- Python environment setup
-- Backend deployment
-- Public HTTP access
+- Elastic IP configuration
+- Cloudflare DNS/proxy configuration
+- Nginx reverse-proxy configuration
+- HTTPS access
+- Docker and Docker Compose
+- Streamlit frontend deployment
+- FastAPI backend deployment
 - Remote model inference
-- Connecting a frontend to a cloud-hosted API
 
-
-# Configuration
-
-The analysis pipeline uses configurable thresholds for model decisions.
-
-Example:
-
-```python
-ai_threshold = 0.70
-source_threshold = 0.60
-```
-
-These thresholds control when model predictions are considered sufficiently strong for the corresponding system decisions.
-
----
 
 # Design Principles
 
-### Deterministic Verdicts
+### Single Multiclass Model
 
-The final authenticity classification is produced by the analysis and decision pipeline rather than by the LLM.
+The current ML pipeline uses one classifier to predict the supported image classes rather than separate real-vs-AI and generator-attribution models.
 
 ### Evidence Over Claims
 
 Forensic metrics and metadata are presented as observations and supporting signals.
 
-### Generator Attribution Is Secondary
+### Model Prediction Is Not Proof
 
-Generator attribution is performed after the image is classified as likely AI-generated and is reported with a qualitative confidence level.
+A high-confidence generator classification does not establish the original source or generator of an image.
 
 ### Provenance Is Supporting Evidence
 
 EXIF, XMP, and C2PA information can provide useful provenance evidence but does not independently establish authenticity.
 
-### No Forced Uncertainty State
+### LLM as an Explanation Layer
 
-The current user-facing decision has two outcomes:
-
-```text
-Likely Real
-Likely AI-Generated
-```
-
-The strength of individual model predictions and generator attribution is communicated through confidence scores and attribution confidence levels.
+The LLM converts structured analysis into a human-readable report rather than acting as the primary image classifier.
 
 ---
 
 # Limitations
 
-ImageTrust should be considered an **experimental forensic analysis system** rather than a definitive authenticity authority.
+Weesil should be considered an **experimental forensic analysis system** rather than a definitive authenticity authority.
 
-### AI Detection
+### Image Classification
 
-- AI detectors can produce false positives and false negatives.
+- ML classifiers can produce false positives and false negatives.
 - Performance can vary across datasets and image domains.
 - Images from unseen generation methods may be difficult to classify reliably.
+- The classifier can only directly represent classes included in its training/evaluation setup.
 
-### Generator Attribution
+### Generator Classification
 
-- Attribution is limited to supported generator classes.
-- High attribution confidence does not prove the original generator.
-- An image generated by an unseen model may be attributed to the closest supported class.
+- Generator classification is limited to supported classes.
+- High confidence does not prove the original generator.
+- An image generated by an unseen model may be classified as the closest supported class.
 
 ### Digital Forensics
 
@@ -739,7 +647,7 @@ ImageTrust should be considered an **experimental forensic analysis system** rat
 # Future Work
 
 - [ ] Calibrate model confidence scores
-- [ ] Expand generator attribution classes
+- [ ] Expand generator classes
 - [ ] Improve cross-generator generalization
 - [ ] Evaluate robustness against compression and resizing
 - [ ] Add adversarial robustness testing
@@ -756,21 +664,19 @@ ImageTrust should be considered an **experimental forensic analysis system** rat
 # Roadmap
 
 ```text
-[x] Real vs AI classifier
-[x] Generator attribution model
+[x] Multiclass image classifier
 [x] Traditional image forensics
 [x] EXIF analysis
 [x] XMP analysis
 [x] C2PA analysis
 [x] LangGraph analysis workflow
-[x] Deterministic decision engine
+[x] Structured analysis pipeline
 [x] LLM evidence report
-[x] Gradio interface
+[x] Streamlit interface
 [x] AWS EC2 deployment
 
 [ ] Final benchmark documentation
 [ ] Model performance visualizations
-[ ] Demo video
 [ ] Confidence calibration
 [ ] Expanded generator coverage
 [ ] Robustness evaluation
@@ -779,27 +685,10 @@ ImageTrust should be considered an **experimental forensic analysis system** rat
 
 ---
 
-# Evaluation Assets
 
-The repository is intended to include:
+# Why Weesil?
 
-```text
-assets/
-├── real-ai-confusion-matrix.png
-├── real-ai-roc.png
-├── generator-performance.png
-└── generator-confusion-matrices.png
-```
-
-These visualizations make the model evaluation easier to inspect alongside the reported numerical metrics.
-
-> **TODO:** Add the final evaluation charts.
-
----
-
-# Why ImageTrust?
-
-ImageTrust demonstrates an end-to-end applied AI system rather than an isolated machine-learning model.
+Weesil demonstrates an end-to-end applied AI system rather than an isolated machine-learning model.
 
 The project combines:
 
@@ -823,27 +712,23 @@ Cloud Deployment
 Interactive UI
 ```
 
-The project covers the complete path from model inference and evidence extraction to API design, workflow orchestration, user interface, and cloud deployment.
+The project covers the path from model inference and evidence extraction to API design, workflow orchestration, user interface, and cloud deployment.
 
 ---
 
-# License
 
-**MIT** Add the project license.
-
----
 
 # Author
 
-**Zaki**
+**Zaki Ansari**
 
-- GitHub: [zakiansari07-art]
-- LinkedIn: [linkedin.com/in/zaki-ansari-b54a53194]
+- GitHub: [zakiansari07-art](https://github.com/zakiansari07-art)
+- LinkedIn: [linkedin.com/in/zaki-ansari-b54a53194](https://linkedin.com/in/zaki-ansari-b54a53194)
 
 ---
 
 # Disclaimer
 
-ImageTrust provides an automated assessment based on machine-learning predictions, forensic signals, and available provenance information.
+Weesil provides an automated assessment based on machine-learning predictions, forensic signals, and available provenance information.
 
-Results such as **Likely Real** and **Likely AI-Generated** represent the system's assessment of the available evidence and should not be interpreted as definitive proof of an image's origin.
+Results such as a **Real** or AI-generator classification represent the system's assessment based on the available evidence and should not be interpreted as definitive proof of an image's origin.
